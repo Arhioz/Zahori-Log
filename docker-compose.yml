@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # --- CONTENEDOR 1: ZAHORI API (FASTAPI) ---
+  api:
+    build: .                                  # Busca el dockerfil en la carpeta actual.
+    image: zahorilog-api:1.0                  # Nombre y version que tendra la imagen generada.
+    container_name: zahorilog-api-contenedor  # Nombre del contenedor activo.
+    ports:
+      - "8000:8000"                           # Mapeo: Puerto de mi equipo -> Puerto del Contenedor
+    env_file:
+      - .env                                  # Inyecta las variables del archivo .env local.
+    volumes:
+      - .:/app
+      # La linea .:/app (Bind Mount o Modo Espejo) sirve para: Si modificas un archivo en VS Code, el cambio se ve reflejado dentro del contenedor al milisegundo. Esto te evita tener que reconstruir la imagen de Docker cada vez que corriges una línea de código.
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - db                                    # Espera a que el contenedor "db" encienda primero.
+    environment:
+       - DATABASE_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+
+
+  # --- CONTENEDOR 2: BASE DE DATOS (POSTGRESQL) ---
+  db:
+    image: postgres:16-alpine                 # Descarga la version optimizada y ligera de Postgres 16
+    container_name: zahorilog-db-contenedor   # Nombre del contenedor activo.
+    ports:
+      - "5432:5432"                           # Esto mapea el puerto interno al puerto de tu laptop, para poder accesarlo con herramientas como Dbeaver
+    environment:
+      POSTGRES_USER: ${DB_USER}               # Al usar ${DB_USER} utiliza los datos que se encuentran en el archivo .env, siempre y cuando este en el mismo directorio donde se ejecuta el docker compose up -d
+      POSTGRES_PASSWORD: ${DB_PASSWORD}       # Docker Compose busca estos datos automaticamente en el archivo .env sin necesidad de importar nada.
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      # Si el contenedor de Postgres se destruye, tus tablas, usuarios y animes siguen vivos en el volumen postgres_data.
+      - postgres_data:/var/lib/postgresql/data
+
+# --- DEFINICIÓN DE VOLÚMENES GLOBALES ---
+volumes:
+  postgres_data:
