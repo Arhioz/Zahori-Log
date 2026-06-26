@@ -11,4 +11,5 @@ env/
 
 Imagenes_logo/
 prueba_pokeapi.py
-prueba_zahoriapi.py
+prueba_jikanapi.py
+prueba_rawgapi.py

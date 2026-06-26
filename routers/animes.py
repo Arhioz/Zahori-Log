@@ -16,8 +16,8 @@ async def buscar_anime(q: str = Query(..., description="Nombre del anime a busca
     
     return resultados
 
-@anime_router.get("/{anime_id}")
-async def obtener_anime_por_id(anime_id: int = Path(..., description="ID oficial de Jikan")):
+@anime_router.get("/{id_anime}")
+async def obtener_anime_por_id(id_anime: int = Path(..., description="ID oficial de Jikan")):
     """Endpoint para obtener la ficha técnica completa de un anime por su ID."""
-    resultado = await jikan_client.buscar_anime_por_id(id_anime=anime_id)
+    resultado = await jikan_client.buscar_anime_por_id(id_anime=id_anime)
     return resultado

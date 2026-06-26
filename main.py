@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from routers import auth_router, users, animes
+from routers import auth_router, users, animes, videojuegos
 
 
 load_dotenv()
@@ -36,6 +36,7 @@ app.add_middleware(
 app.include_router(auth_router.auth_router)
 app.include_router(users.user_router)
 app.include_router(animes.anime_router)
+app.include_router(videojuegos.videojuego_router)
 
 
 @app.get("/")
