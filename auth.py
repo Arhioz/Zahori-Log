@@ -58,7 +58,7 @@ def create_access_token(data: dict) -> str:
 # --- MIDDLEWARE DE AUTENTICACION ---
 
 # 1. Esto le dice a FastAPI de dónde sacar el token (de la ruta /login)
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # 2. Función para obtener al usuario actual a partir del Token
 async def obtener_usuario_actual(

@@ -54,7 +54,7 @@ class UserCreatePro(BaseConfigModel):
 class UserResponsePro(UserBase):
     id: int
     is_active: bool
-    role: str = Field(..., examples=["user"])
+    role: str = Field(..., examples=["admin"])
     created_at: datetime
 
 
@@ -99,13 +99,16 @@ class TokenData(BaseModel):
 # --- SCHEMAS DE ANIMES (Catálogo Global) ---
 
 class AnimeBase(BaseConfigModel):
-    titulo: str = Field(..., min_length=1, max_length=150, examples=["Jujutsu Kaisen"])
-    sinopsis: Optional[str] = Field(default=None)
+    jikan_id: int
+    title: str = Field(..., min_length=1, max_length=150, examples=["Jujutsu Kaisen"])
+    image_url: Optional[str] = Field(default=None)
+    type: Optional[str] = Field(default=None)
     # gt=0 asegura que sea mayor a 0.
-    episodios: Optional[int] = Field(default=None, gt=0, examples=[24])
-    categoria: str = Field(..., examples=["Acción, Sobrenatural"])
-    # La puntuación aquí sería el promedio global (opcional)
-    puntuacion_global: Optional[float] = Field(default=None, ge=0, le=10)
+    episodes: Optional[int] = Field(default=None, gt=0, examples=[24])
+    aired: Optional[str] = Field(default=None)
+    genre: Optional[list[str]] = Field(..., examples=["Action, Sci-Fi"])
+    synopsis: Optional[str] = Field(default=None)
+    global_score: Optional[float] = Field(default=None, ge=0, le=10)
 
 class AnimeCreate(AnimeBase):
     pass
@@ -120,10 +123,14 @@ class AnimeRatingUpdate(BaseConfigModel): # <--- Esquema específico solo para a
 # --- SCHEMA DE VIDEOJUEGOS (Catálogo Global) ---
 
 class VideojuegoBase(BaseConfigModel):
-    titulo: str = Field(..., min_length=1, max_length=150, examples=["Nier Automata"])
-    sinopsis: Optional[str] = Field(default=None)
-    categoria: str = Field(..., examples=["Hack n Slash"])
-    puntuacion_global: Optional[float] = Field(default=None, ge=0, le=10)
+    rawg_id: int
+    title: str = Field(..., min_length=1, max_length=150, examples=["Nier Automata"])
+    image_url: Optional[str] = Field(default=None)
+    released: Optional[str] = Field(default=None)
+    genre: Optional[list[str]] = Field(..., examples=["Adventure, Indie"])
+    description: Optional[str] = Field(default=None)
+    platforms: Optional[list[str]] = Field(..., examples=["PC, PlayStation"])
+    metacritic_score: Optional[float] = Field(default=None, ge=0, le=100)
 
 class VideojuegoCreate(VideojuegoBase):
     pass
@@ -138,8 +145,8 @@ class VideojuegoRatingUpdate(BaseConfigModel):
 # --- SCHEMAS DE ANIME LOGS (El registro personal del usuario) ---
 
 class AnimeLogBase(BaseConfigModel):
-    visto: bool = Field(default=False)
-    puntuacion_personal: Optional[float] = Field(default=None, ge=0, le=10)
+    status: str = Field(default="Viendo", examples=["Viendo", "Completado", "En Espera", "Abandonado"])
+    user_rating: Optional[float] = Field(default=None, ge=0, le=10)
 
 class AnimeLogCreate(AnimeLogBase):
     anime_id: int = Field(..., description="El ID del anime que el usuario quiere agregar a su lista")
@@ -147,19 +154,30 @@ class AnimeLogCreate(AnimeLogBase):
 class AnimeLogResponse(AnimeLogBase):
     id: int
     anime: AnimeResponse  # Aquí anidamos el anime para saber qué estamos viendo
-    user: UserSimpleResponse # ¡Aquí sí va el dueño! Porque este registro es suyo.
+    user: UserSimpleResponse # Estos campos se veran de forma anidada en la response body del endpoint
 
+class AnimeLogEstado(BaseConfigModel):
+    status: str = Field(default="Viendo", examples=["Viendo", "Completado", "En Espera", "Abandonado"])
+
+class AnimeLogPuntuacion(BaseConfigModel):
+    user_rating: Optional[float] = Field(default=None, ge=0, le=10)
 
 # --- SCHEMA DE VIDEOJUEGO LOGS (El registro personal del usuario) ---
 
 class VideojuegoLogBase(BaseConfigModel):
-    terminado: bool = Field(default=False)
-    puntuacion_personal: Optional[float] = Field(default=None, ge=0, le=10)
+    status: str = Field(default="Jugando", examples=["Jugando", "Completado", "En Espera", "Abandonado"])
+    user_rating: Optional[float] = Field(default=None, ge=0, le=10)
 
 class VideojuegoLogCreate(VideojuegoLogBase):
-    videojuego_id: int
+    game_id: int
 
 class VideojuegoLogResponse(VideojuegoLogBase):
     id: int
-    videojuego: VideojuegoResponse
+    game: VideojuegoResponse
     user: UserSimpleResponse
+
+class VideojuegoLogEstado(BaseConfigModel):
+    status: str = Field(default="Viendo", examples=["Viendo", "Completado", "En Espera", "Abandonado"])
+
+class VideojuegoLogPuntuacion(BaseConfigModel):
+    user_rating: Optional[float] = Field(default=None, ge=0, le=10)

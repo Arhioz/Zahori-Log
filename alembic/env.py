@@ -1,3 +1,6 @@
+# En la funcion do_run_migrations se agrega el parametro compare_type=True
+# para que tambien compare y actualice los tipos de datos de las columnas.
+
 import asyncio
 from logging.config import fileConfig
 
@@ -55,6 +58,7 @@ def run_migrations_offline() -> None:
     context.configure(
         url=url,
         target_metadata=target_metadata,
+        compare_type=True, # <-- Tambien agregamos , compare_type=True aqui
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
     )
@@ -64,7 +68,10 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=target_metadata)
+    context.configure(connection=connection, target_metadata=target_metadata, compare_type=True)
+    # compare_type=True es para que al momento de comparar las tablas actuales
+    # con las de la nueva migracion, tambien se comparen los tipos de datos
+    # ej. pasar de hashed_password = Column(String(25)) --> de hashed_password = Column(String)
 
     with context.begin_transaction():
         context.run_migrations()
