@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, Query, Path, Depends, status
+from fastapi import APIRouter, HTTPException, Query, Path, Depends, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from services import rawg_client
 import crud, schemas, models, auth
+from limiter import limiter
 from database import get_db
 
 videojuego_router = APIRouter(
@@ -10,7 +11,8 @@ videojuego_router = APIRouter(
 )
 
 @videojuego_router.get("/buscar")
-async def buscar_videojuego(search: str = Query(..., description="Nombre del videojuego a buscar"), page_size: int = 5):
+@limiter.limit("20/minute")
+async def buscar_videojuego(request: Request, search: str = Query(..., description="Nombre del videojuego a buscar"), page_size: int = 5):
     """Endpoint para buscar videojuegos por coincidencia de nombre."""
     resultados = await rawg_client.buscar_videojuego_por_nombre(query=search, limite=page_size)
     if not resultados:
@@ -18,7 +20,8 @@ async def buscar_videojuego(search: str = Query(..., description="Nombre del vid
     return resultados
 
 @videojuego_router.get("/{id_videojuego}")
-async def obtener_videojuego_por_id(id_videojuego: int = Path(..., description="ID oficial de RAWG")):
+@limiter.limit("20/minute")
+async def obtener_videojuego_por_id(request: Request, id_videojuego: int = Path(..., description="ID oficial de RAWG")):
     """Endpoint para obtener la ficha técnica completa de un videojuego por su ID."""
     resultado = await rawg_client.buscar_videojuego_por_id(id_videojuego=id_videojuego)
     return resultado
@@ -26,7 +29,9 @@ async def obtener_videojuego_por_id(id_videojuego: int = Path(..., description="
 # --- RUTAS PROTEGIDAS (LOG PERSONAL) ---
 
 @videojuego_router.post("/mi-lista", response_model=schemas.VideojuegoLogResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit("30/minute")
 async def agregar_videojuego_a_mi_lista(
+    request: Request,
     datos_log: schemas.VideojuegoLogCreate, 
     db: AsyncSession = Depends(get_db), 
     usuario_actual: models.User = Depends(auth.obtener_usuario_actual)
@@ -68,7 +73,9 @@ async def agregar_videojuego_a_mi_lista(
     return nuevo_log
 
 @videojuego_router.get("/mi-lista/completa", response_model=list[schemas.VideojuegoLogResponse])
+@limiter.limit("20/minute")
 async def obtener_mi_lista_de_videojuegos(
+    request: Request,
     skip: int = 0,
     limit: int = 10,
     db: AsyncSession = Depends(get_db),
@@ -81,7 +88,9 @@ async def obtener_mi_lista_de_videojuegos(
     return mi_lista
 
 @videojuego_router.patch("/mi-lista/estado/{log_id}", response_model=schemas.VideojuegoLogResponse)
+@limiter.limit("20/minute")
 async def actualizar_estado_videojuego_en_mi_lista(
+    request: Request,
     log_id: int,
     datos_actualizacion: schemas.VideojuegoLogEstado,
     db: AsyncSession = Depends(get_db),
@@ -95,7 +104,9 @@ async def actualizar_estado_videojuego_en_mi_lista(
     return log_actualizado
 
 @videojuego_router.patch("/mi-lista/puntuacion/{log_id}", response_model=schemas.VideojuegoLogResponse)
+@limiter.limit("20/minute")
 async def actualizar_puntuacion_videojuego_en_mi_lista(
+    request: Request,
     log_id: int,
     datos_actualizacion: schemas.VideojuegoLogPuntuacion,
     db: AsyncSession = Depends(get_db),
@@ -109,7 +120,9 @@ async def actualizar_puntuacion_videojuego_en_mi_lista(
     return log_actualizado
 
 @videojuego_router.delete("/mi-lista/{log_id}")
+@limiter.limit("20/minute")
 async def eliminar_un_videojuego_del_log(
+    request: Request,
     log_id: int,
     db: AsyncSession = Depends(get_db),
     usuario_actual: models.User = Depends(auth.obtener_usuario_actual)

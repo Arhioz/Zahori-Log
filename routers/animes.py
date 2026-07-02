@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, Query, Path, Depends, status
+from fastapi import APIRouter, HTTPException, Query, Path, Depends, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from services import jikan_client
 import crud, schemas, models, auth
+from limiter import limiter
 from database import get_db
 
 anime_router = APIRouter(
@@ -10,7 +11,8 @@ anime_router = APIRouter(
 )
 
 @anime_router.get("/buscar")
-async def buscar_anime(q: str = Query(..., description="Nombre del anime a buscar"), limite: int = 5):
+@limiter.limit("20/minute")
+async def buscar_anime(request: Request, q: str = Query(..., description="Nombre del anime a buscar"), limite: int = 5):
     """Endpoint para buscar animes por coincidencia de nombre."""
     resultados = await jikan_client.buscar_anime_por_nombre(query=q, limite=limite)
     if not resultados:
@@ -18,7 +20,8 @@ async def buscar_anime(q: str = Query(..., description="Nombre del anime a busca
     return resultados
 
 @anime_router.get("/{id_anime}")
-async def obtener_anime_por_id(id_anime: int = Path(..., description="ID oficial de Jikan")):
+@limiter.limit("20/minute")
+async def obtener_anime_por_id(request: Request, id_anime: int = Path(..., description="ID oficial de Jikan")):
     """Endpoint para obtener la ficha técnica completa de un anime por su ID."""
     resultado = await jikan_client.buscar_anime_por_id(id_anime=id_anime)
     return resultado
@@ -26,7 +29,9 @@ async def obtener_anime_por_id(id_anime: int = Path(..., description="ID oficial
 # --- RUTAS PROTEGIDAS (LOG PERSONAL) ---
 
 @anime_router.post("/mi-lista", response_model=schemas.AnimeLogResponse, status_code=status.HTTP_201_CREATED)
+@limiter.limit("30/minute")
 async def agregar_anime_a_mi_lista(
+    request: Request,
     datos_log: schemas.AnimeLogCreate, 
     db: AsyncSession = Depends(get_db), 
     usuario_actual: models.User = Depends(auth.obtener_usuario_actual)
@@ -68,7 +73,9 @@ async def agregar_anime_a_mi_lista(
     return nuevo_log
 
 @anime_router.get("/mi-lista/completa", response_model=list[schemas.AnimeLogResponse])
+@limiter.limit("20/minute")
 async def obtener_mi_lista_de_animes(
+    request: Request,
     skip: int = 0,
     limit: int = 10,
     db: AsyncSession = Depends(get_db),
@@ -81,7 +88,9 @@ async def obtener_mi_lista_de_animes(
     return mi_lista
 
 @anime_router.patch("/mi-lista/estado/{log_id}", response_model=schemas.AnimeLogResponse)
+@limiter.limit("20/minute")
 async def actualizar_estado_anime_en_mi_lista(
+    request: Request,
     log_id: int,
     datos_actualizacion: schemas.AnimeLogEstado,
     db: AsyncSession = Depends(get_db),
@@ -95,7 +104,9 @@ async def actualizar_estado_anime_en_mi_lista(
     return log_actualizado
 
 @anime_router.patch("/mi-lista/puntuacion/{log_id}", response_model=schemas.AnimeLogResponse)
+@limiter.limit("20/minute")
 async def actualizar_puntuacion_anime_en_mi_lista(
+    request: Request,
     log_id: int,
     datos_actualizacion: schemas.AnimeLogPuntuacion,
     db: AsyncSession = Depends(get_db),
@@ -109,7 +120,9 @@ async def actualizar_puntuacion_anime_en_mi_lista(
     return log_actualizado
 
 @anime_router.delete("/mi-lista/{log_id}")
+@limiter.limit("20/minute")
 async def eliminar_un_anime_del_log(
+    request: Request,
     log_id: int,
     db: AsyncSession = Depends(get_db),
     usuario_actual: models.User = Depends(auth.obtener_usuario_actual)

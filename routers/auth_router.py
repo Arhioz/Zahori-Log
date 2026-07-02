@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import auth, crud, schemas
+from limiter import limiter
 from database import get_db
 
 auth_router = APIRouter(
@@ -11,7 +12,8 @@ auth_router = APIRouter(
 
 # Habilita el boton "Authorize" en swagger
 @auth_router.post("/token", response_model=schemas.Token)
-async def login_para_obtener_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
+@limiter.limit("5/minute")
+async def login_para_obtener_access_token(request: Request, form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
     # 1. Buscamos al usuario por su username
     usuario = await crud.obtener_usuario_por_username(db, username=form_data.username)
     

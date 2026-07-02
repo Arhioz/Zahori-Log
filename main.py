@@ -1,7 +1,10 @@
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from slowapi.errors import RateLimitExceeded
+from limiter import limiter
 from routers import auth_router, users, animes, videojuegos
 
 
@@ -17,6 +20,21 @@ app = FastAPI(
         "email": "arhioz@zahorilog.com",
     }
 )
+
+# --- CONFIGURACION RATE LIMITING ---
+# 1. Asignamos el limitador al estado de la aplicación
+app.state.limiter = limiter
+
+# 2. Configuramos qué responder cuando alguien excede el límite (Error 429)
+@app.exception_handler(RateLimitExceeded)
+async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
+    return JSONResponse(
+        status_code=429,
+        content={
+            "error": "Demasiadas peticiones",
+            "mensaje": "Has superado el límite de peticiones permitido. Por favor, intenta más tarde."
+        }
+    )
 
 # --- CONFIGURACIÓN CORS ---
 # Obtenemos la cadena del .env y la convertimos en lista
