@@ -12,7 +12,7 @@ class BaseConfigModel(BaseModel):
 
 # Esquema base con lo que todo usuario comparte
 class UserBase(BaseModel):
-    username: str = Field(..., min_length=3, max_length=50, description="Nombre de usuario único", examples=["User_01"])
+    username: str = Field(..., min_length=2, max_length=50, description="Nombre de usuario único", examples=["User_01"])
     email: EmailStr = Field(..., description="Correo electrónico válido", examples=["example@email.com"])
 
 # Lo que pedimos cuando un usuario se registra (Aquí viaja la contraseña en texto plano)

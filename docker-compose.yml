@@ -2,22 +2,22 @@ version: '3.8'
 
 services:
   # --- CONTENEDOR 1: ZAHORI API (FASTAPI) ---
-  # api:
-  #   build: .                                  # Busca el dockerfil en la carpeta actual.
-  #   image: zahorilog-api:1.0                  # Nombre y version que tendra la imagen generada.
-  #   container_name: zahorilog-api-contenedor  # Nombre del contenedor activo.
-  #   ports:
-  #     - "8000:8000"                           # Mapeo: Puerto de mi equipo -> Puerto del Contenedor
-  #   env_file:
-  #     - .env                                  # Inyecta las variables del archivo .env local.
-  #   volumes:
-  #     - .:/app
-  #     # La linea .:/app (Bind Mount o Modo Espejo) sirve para: Si modificas un archivo en VS Code, el cambio se ve reflejado dentro del contenedor al milisegundo. Esto te evita tener que reconstruir la imagen de Docker cada vez que corriges una línea de código.
-  #   command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-  #   depends_on:
-  #     - db                                    # Espera a que el contenedor "db" encienda primero.
-  #   environment:
-  #      - DATABASE_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+  api:
+    build: .                                  # Busca el dockerfil en la carpeta actual.
+    image: zahorilog-api:1.0                  # Nombre y version que tendra la imagen generada.
+    container_name: zahorilog-api-contenedor  # Nombre del contenedor activo.
+    ports:
+      - "8000:8000"                           # Mapeo: Puerto de mi equipo -> Puerto del Contenedor
+    env_file:
+      - .env                                  # Inyecta las variables del archivo .env local.
+    volumes:
+      - .:/app
+      # La linea .:/app (Bind Mount o Modo Espejo) sirve para: Si modificas un archivo en VS Code, el cambio se ve reflejado dentro del contenedor al milisegundo. Esto te evita tener que reconstruir la imagen de Docker cada vez que corriges una línea de código.
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - db                                    # Espera a que el contenedor "db" encienda primero.
+    environment:
+       - DATABASE_URL=postgresql+asyncpg://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
 
 
   # --- CONTENEDOR 2: BASE DE DATOS (POSTGRESQL) ---

@@ -10,6 +10,6 @@ __pycache__
 .pytest_cache
 
 Imagenes_logo/
-prueba_pokeapi.py
+prueba_api.py
 prueba_jikanapi.py
 prueba_rawgapi.py
