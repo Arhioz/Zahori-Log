@@ -32,7 +32,9 @@ services:
       POSTGRES_DB: ${DB_NAME}
     volumes:
       # Si el contenedor de Postgres se destruye, tus tablas, usuarios y animes siguen vivos en el volumen postgres_data.
-      - postgres_data:/var/lib/postgresql/data
+      - ./postgres_data:/var/lib/postgresql/data
+      # El punto "." le dice a Docker que guarde los datos DENTRO de la carpeta actual de tu proyecto. (Solo usar en desarrollo)
+      # La próxima vez que copies la carpeta entera a otro lugar, las tablas y tus datos reales se irán contigo automáticamente y no tendrás que volver a correr Alembic.
 
 # --- DEFINICIÓN DE VOLÚMENES GLOBALES ---
 volumes:

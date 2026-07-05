@@ -101,10 +101,13 @@ class TokenData(BaseModel):
 class AnimeBase(BaseConfigModel):
     jikan_id: int
     title: str = Field(..., min_length=1, max_length=150, examples=["Jujutsu Kaisen"])
+    title_japanese: Optional[str] = Field(..., min_length=1, max_length=150)
     image_url: Optional[str] = Field(default=None)
     type: Optional[str] = Field(default=None)
     # gt=0 asegura que sea mayor a 0.
     episodes: Optional[int] = Field(default=None, gt=0, examples=[24])
+    duration: Optional[str] = Field(default=None)
+    studio: Optional[list[str]] = Field(..., examples=["MAPPA, Gainax"])
     aired: Optional[str] = Field(default=None)
     genre: Optional[list[str]] = Field(..., examples=["Action, Sci-Fi"])
     synopsis: Optional[str] = Field(default=None)
@@ -129,6 +132,7 @@ class VideojuegoBase(BaseConfigModel):
     released: Optional[str] = Field(default=None)
     genre: Optional[list[str]] = Field(..., examples=["Adventure, Indie"])
     description: Optional[str] = Field(default=None)
+    developers: Optional[str] = Field(default=None)
     platforms: Optional[list[str]] = Field(..., examples=["PC, PlayStation"])
     metacritic_score: Optional[float] = Field(default=None, ge=0, le=100)
 

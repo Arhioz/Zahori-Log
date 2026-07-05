@@ -27,9 +27,12 @@ class Anime(Base):
     id = Column(Integer, primary_key=True, index=True)
     jikan_id = Column(Integer, unique=True, index=True, nullable=False)  # ID de la API Jikan
     title = Column(String, nullable=False)
+    title_japanese = Column(String, nullable=True)
     image_url = Column(String, nullable=True)
     type = Column(String, nullable=True)
     episodes = Column(Integer, default=0)
+    duration = Column(String, nullable=True)
+    studio = Column(MutableList.as_mutable(ARRAY(String)), nullable=True)
     aired = Column(String, nullable=True)
     genre = Column(MutableList.as_mutable(ARRAY(String)), nullable=True)
     synopsis = Column(Text, nullable=True)
@@ -67,6 +70,7 @@ class Videojuego(Base):
     released = Column(String, nullable=True) # <- Fecha de lanzamineto del videojuego
     genre = Column(MutableList.as_mutable(ARRAY(String)), nullable=True)
     description = Column(Text, nullable=True) # <- Guarda la descripción del juego
+    developers = Column(String, nullable=True)
     platforms = Column(MutableList.as_mutable(ARRAY(String)), nullable=True)
     metacritic_score = Column(Float, nullable=True)
 

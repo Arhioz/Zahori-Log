@@ -118,9 +118,12 @@ async def crear_anime_local(db: AsyncSession, jikan_data: dict):
     nuevo_anime = models.Anime(
         jikan_id=jikan_data.get("mal_id"),
         title=jikan_data.get("title"),
+        title_japanese=jikan_data.get("title_japanese"),
         image_url=jikan_data.get("images", {}).get("jpg", {}).get("image_url"),
         type=jikan_data.get("type"),
         episodes=jikan_data.get("episodes"),
+        duration=jikan_data.get("duration"),
+        studio=[estudio["name"] for estudio in jikan_data["studios"]],
         aired=jikan_data.get("aired", {}).get("string"),
         genre = [genero["name"] for genero in jikan_data["genres"]], # List comprehension, permite crear nuevas listas de forma concisa y elegante aplicando una expresión a cada elemento de un iterable existente (como otra lista o un rango)
         synopsis=jikan_data.get("synopsis"),
@@ -238,6 +241,7 @@ async def crear_videojuego_local(db: AsyncSession, rawg_data: dict):
         released=rawg_data.get("released"),
         genre = [genero["name"] for genero in rawg_data["genres"]],
         description=rawg_data.get("description"),
+        developers=[desarrollador["name"] for desarrollador in rawg_data["developers"]],
         platforms = [item["platform"]["name"] for item in rawg_data["platforms"]],
         metacritic_score = rawg_data.get("metacritic")
     )
