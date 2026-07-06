@@ -166,6 +166,9 @@ class AnimeLogEstado(BaseConfigModel):
 class AnimeLogPuntuacion(BaseConfigModel):
     user_rating: Optional[float] = Field(default=None, ge=0, le=10)
 
+class AnimeLogFavorito(BaseConfigModel):
+    is_favorite: bool
+
 # --- SCHEMA DE VIDEOJUEGO LOGS (El registro personal del usuario) ---
 
 class VideojuegoLogBase(BaseConfigModel):
@@ -185,3 +188,6 @@ class VideojuegoLogEstado(BaseConfigModel):
 
 class VideojuegoLogPuntuacion(BaseConfigModel):
     user_rating: Optional[float] = Field(default=None, ge=0, le=10)
+
+class VideojuegoLogFavorito(BaseConfigModel):
+    is_favorite: bool

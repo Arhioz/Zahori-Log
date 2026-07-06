@@ -119,6 +119,20 @@ async def actualizar_puntuacion_anime_en_mi_lista(
     log_actualizado = await crud.actualizar_puntuacion_anime_log(db=db, log_db=log_existente, datos_nuevos=datos_actualizacion)
     return log_actualizado
 
+@anime_router.patch("/mi-lista/favorito/{log_id}", response_model=schemas.AnimeLogResponse)
+@limiter.limit("20/minute")
+async def actualizar_favorito_anime_en_mi_lista(
+    request: Request, log_id: int, datos_actualizacion: schemas.AnimeLogFavorito,
+    db: AsyncSession = Depends(get_db), usuario_actual: models.User = Depends(auth.obtener_usuario_actual)
+):
+    """Añade o quita un anime de los favoritos."""
+    log_existente = await crud.obtener_anime_log_por_id(db=db, log_id=log_id, user_id=usuario_actual.id)
+    if not log_existente:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="El registro no existe en tu lista.")
+    
+    log_actualizado = await crud.actualizar_favorito_anime_log(db=db, log_db=log_existente, is_favorite=datos_actualizacion.is_favorite)
+    return log_actualizado
+
 @anime_router.delete("/mi-lista/{log_id}")
 @limiter.limit("20/minute")
 async def eliminar_un_anime_del_log(

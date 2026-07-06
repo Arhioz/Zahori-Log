@@ -216,7 +216,15 @@ async def actualizar_puntuacion_anime_log(db: AsyncSession, log_db: models.Anime
     await db.refresh(log_db)
     return log_db
 
-#7. Eliminar un anime del log
+# 7. Actualizar estado favorito del anime en el log
+async def actualizar_favorito_anime_log(db: AsyncSession, log_db: models.AnimeLog, is_favorite: bool):
+    """Actualiza el estado de favorito de un anime en el diario personal."""
+    log_db.is_favorite = is_favorite
+    await db.commit()
+    await db.refresh(log_db)
+    return log_db
+
+#8. Eliminar un anime del log
 async def eliminar_un_anime_log(db: AsyncSession, log_db: models.AnimeLog):
     """Elimina un anime del diario personal"""
     await db.delete(log_db)
@@ -331,7 +339,15 @@ async def actualizar_puntuacion_videojuego_log(db: AsyncSession, log_db: models.
     await db.refresh(log_db)
     return log_db
 
-#7. Eliminar un videojuego del log
+# 7. Actualizar estado favorito del videojuego en el log
+async def actualizar_favorito_videojuego_log(db: AsyncSession, log_db: models.VideojuegoLog, is_favorite: bool):
+    """Actualiza el estado de favorito de un videojuego en el diario personal."""
+    log_db.is_favorite = is_favorite
+    await db.commit()
+    await db.refresh(log_db)
+    return log_db
+
+#8. Eliminar un videojuego del log
 async def eliminar_un_videojuego_log(db: AsyncSession, log_db: models.VideojuegoLog):
     """Elimina un videojuego del diario personal"""
     await db.delete(log_db)

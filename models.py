@@ -54,6 +54,7 @@ class AnimeLog(Base):
     current_episode = Column(Integer, default=0)
     user_rating = Column(Float, nullable=True)  # Calificación del usuario (ej. del 1 al 10)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+    is_favorite = Column(Boolean, default=False)
 
     # Relaciones de SQLAlchemy
     user = relationship("User", back_populates="anime_logs")
@@ -89,6 +90,7 @@ class VideojuegoLog(Base):
     status = Column(String, default="Jugando")  # Jugando, Completado, En Espera, Abandonado
     user_rating = Column(Float, nullable=True)
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
+    is_favorite = Column(Boolean, default=False)
 
     # Relaciones de SQLAlchemy
     user = relationship("User", back_populates="videojuego_logs")
