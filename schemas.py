@@ -132,7 +132,7 @@ class VideojuegoBase(BaseConfigModel):
     released: Optional[str] = Field(default=None)
     genre: Optional[list[str]] = Field(..., examples=["Adventure, Indie"])
     description: Optional[str] = Field(default=None)
-    developers: Optional[str] = Field(default=None)
+    developers: Optional[list[str]] = Field(default=None)
     platforms: Optional[list[str]] = Field(..., examples=["PC, PlayStation"])
     metacritic_score: Optional[float] = Field(default=None, ge=0, le=100)
 
@@ -151,6 +151,7 @@ class VideojuegoRatingUpdate(BaseConfigModel):
 class AnimeLogBase(BaseConfigModel):
     status: str = Field(default="Viendo", examples=["Viendo", "Completado", "En Espera", "Abandonado"])
     user_rating: Optional[float] = Field(default=None, ge=0, le=10)
+    is_favorite: bool = False
 
 class AnimeLogCreate(AnimeLogBase):
     anime_id: int = Field(..., description="El ID del anime que el usuario quiere agregar a su lista")
@@ -174,6 +175,7 @@ class AnimeLogFavorito(BaseConfigModel):
 class VideojuegoLogBase(BaseConfigModel):
     status: str = Field(default="Jugando", examples=["Jugando", "Completado", "En Espera", "Abandonado"])
     user_rating: Optional[float] = Field(default=None, ge=0, le=10)
+    is_favorite: bool = False
 
 class VideojuegoLogCreate(VideojuegoLogBase):
     game_id: int

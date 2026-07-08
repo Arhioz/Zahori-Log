@@ -12,7 +12,7 @@ anime_router = APIRouter(
 
 @anime_router.get("/buscar")
 @limiter.limit("20/minute")
-async def buscar_anime(request: Request, q: str = Query(..., description="Nombre del anime a buscar"), limite: int = 5):
+async def buscar_anime(request: Request, q: str = Query(..., description="Nombre del anime a buscar"), limite: int = 8):
     """Endpoint para buscar animes por coincidencia de nombre."""
     resultados = await jikan_client.buscar_anime_por_nombre(query=q, limite=limite)
     if not resultados:

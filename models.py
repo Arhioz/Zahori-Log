@@ -71,7 +71,7 @@ class Videojuego(Base):
     released = Column(String, nullable=True) # <- Fecha de lanzamineto del videojuego
     genre = Column(MutableList.as_mutable(ARRAY(String)), nullable=True)
     description = Column(Text, nullable=True) # <- Guarda la descripción del juego
-    developers = Column(String, nullable=True)
+    developers = Column(MutableList.as_mutable(ARRAY(String)), nullable=True)
     platforms = Column(MutableList.as_mutable(ARRAY(String)), nullable=True)
     metacritic_score = Column(Float, nullable=True)
 
